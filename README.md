@@ -5,6 +5,17 @@ This program can operate Amazon Athena from AWS Lambda.
 # Preparation
 1. Fill config/credential file to access to Athena.
 
+# Execute
+Build:
+
+```
+$ mvn clean package
+```
+Clean is needed for installing Amazon Athena jar file (as third party) to user local repository.
+
+Execute:
+Deploy the jar file to AWS Lambda (from S3 better) and execute. For memory at least 192 MB needed, for timeout around 20 sec needed at least.
+
 # Input
 1. Currently, as input value, following columns are acceptable.
 
