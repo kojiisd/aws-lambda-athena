@@ -17,10 +17,10 @@ Execute:
 Deploy the jar file to AWS Lambda (from S3 better) and execute. For memory at least 192 MB needed, for timeout around 20 sec needed at least.
 
 # Input
-1. Currently, as input value, following columns are acceptable.
+Currently, as input value, following columns are acceptable.
 
 |No|Column Name|Description|Required|
-|-----------:|:------------:|:------------:|:------------:|
+|-----------:|:------------:|:------------|:------------:|
 |1|region|Region name for AWS|false|
 |2|s3Path|Amazon S3 path for querying Athena|true|
 |3|sql|SQL for Athena|true|
