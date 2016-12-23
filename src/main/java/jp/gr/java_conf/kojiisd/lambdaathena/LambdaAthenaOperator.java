@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Accessing to operate Athena
+ * @author kojiisd
+ */
 public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
     private Map<String, String> regionMap = new HashMap();
 
@@ -33,6 +37,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
 
         Formatter formatter = new Formatter();
         String athenaUrl = formatter.format("jdbc:awsathena://athena.%s.amazonaws.com:443", input.region).toString();
+        logger.log("Access to :" + athenaUrl + "\n");
 
         if (!valid) {
             return "Input parameters are not enough. input: " + input;
@@ -47,7 +52,9 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
                 info.put("s3_staging_dir", input.s3Path);
             }
             info.put("aws_credentials_provider_class", "com.amazonaws.auth.PropertiesFileCredentialsProvider");
-            info.put("aws_credentials_provider_arguments", "/Users/myUser/.athenaCredentials");
+
+            // Put credential information.
+            info.put("aws_credentials_provider_arguments", "config/credential");
             String databaseName;
             if (StringUtils.isBlank(input.database)) {
                 databaseName = "default";
@@ -55,10 +62,8 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
                 databaseName = input.database;
             }
 
-            logger.log("Connecting to Athena...");
             conn = DriverManager.getConnection(athenaUrl, info);
 
-            logger.log("Listing tables...");
             String sql = "show tables in " + databaseName;
             statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(sql);
@@ -68,7 +73,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
                 String name = rs.getString("tab_name");
 
                 //Display values.
-                logger.log("Name: " + name);
+                logger.log("Name: " + name + "\n");
             }
             rs.close();
             conn.close();
@@ -89,7 +94,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
                 ex.printStackTrace();
             }
         }
-        logger.log("Finished connecting to Athena.");
+        logger.log("Finished connecting to Athena.\n");
 
         return input.toString();
     }
