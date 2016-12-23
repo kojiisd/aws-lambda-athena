@@ -25,7 +25,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
 
     public LambdaAthenaOperator() {
         this.regionMap.put("us-east-1", "us-east-1");
-        this.regionMap.put("us-east-2", "us-east-2");
+        this.regionMap.put("us-west-2", "us-west-2");
     }
 
     public Object handleRequest(Request input, Context context) {
