@@ -13,15 +13,19 @@ public class Request {
 
     @Getter
     @Setter
-    public String database;
-
-    @Getter
-    @Setter
     public String region;
 
     @Getter
     @Setter
     public String s3Path;
+
+    @Getter
+    @Setter
+    public String sql;
+
+    @Getter
+    @Setter
+    public String columnListStr;
 
     @Override
     public String toString() {

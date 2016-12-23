@@ -17,6 +17,7 @@ import java.util.Properties;
 
 /**
  * Accessing to operate Athena
+ *
  * @author kojiisd
  */
 public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
@@ -30,10 +31,11 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
     public Object handleRequest(Request input, Context context) {
         Connection conn = null;
         Statement statement = null;
+        StringBuilder columnSb = null;
 
         LambdaLogger logger = context.getLogger();
 
-        boolean valid = isValid(input);
+        boolean valid = isRequiredValid(input);
 
         Formatter formatter = new Formatter();
         String athenaUrl = formatter.format("jdbc:awsathena://athena.%s.amazonaws.com:443", input.region).toString();
@@ -55,30 +57,35 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
 
             // Put credential information.
             info.put("aws_credentials_provider_arguments", "config/credential");
-            String databaseName;
-            if (StringUtils.isBlank(input.database)) {
-                databaseName = "default";
-            } else {
-                databaseName = input.database;
-            }
 
             conn = DriverManager.getConnection(athenaUrl, info);
 
-            String sql = "show tables in " + databaseName;
             statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(input.sql);
+
+            String[] columnArray = input.columnListStr.split(",");
+            columnSb = new StringBuilder();
+            columnSb.append(input.columnListStr).append(System.getProperty("line.separator"));
 
             while (rs.next()) {
-                //Retrieve table column.
-                String name = rs.getString("tab_name");
+                int length = columnSb.length();
 
-                //Display values.
-                logger.log("Name: " + name + "\n");
+                //Retrieve table column.
+                for (String column : columnArray) {
+                    if (StringUtils.isBlank(column)) {
+                        continue;
+                    }
+                    columnSb.append(",").append(rs.getString(column.trim()));
+                }
+                columnSb.delete(length, length + 1);
+                columnSb.append(System.getProperty("line.separator"));
             }
             rs.close();
             conn.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+
+            return "Exception happened, aborted.";
         } finally {
             try {
                 if (statement != null)
@@ -94,25 +101,27 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
                 ex.printStackTrace();
             }
         }
+
+        String result = "Input parameter:" + input.toString() + "\n\nresult:\n" + columnSb.toString();
         logger.log("Finished connecting to Athena.\n");
 
-        return input.toString();
+        logger.log(result);
+
+        return result;
     }
 
 
-    private boolean isValid(Request request) {
-        if (StringUtils.isBlank(request.database)) {
+    private boolean isRequiredValid(Request request) {
+
+        if (StringUtils.isBlank(request.sql)) {
             return false;
         }
 
-        if (StringUtils.isBlank(request.s3Path)) {
-            return false;
-        }
-
-        if (StringUtils.isBlank(request.region) || StringUtils.isBlank(this.regionMap.get(request.region))) {
+        if (StringUtils.isBlank(request.columnListStr)) {
             return false;
         }
 
         return true;
     }
+
 }
