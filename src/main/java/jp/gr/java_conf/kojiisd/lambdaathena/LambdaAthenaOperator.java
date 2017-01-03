@@ -112,6 +112,13 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
 
 
     private boolean isRequiredValid(Request request) {
+        if (request == null) {
+            return false;
+        }
+
+        if (StringUtils.isBlank(request.s3Path)) {
+            return false;
+        }
 
         if (StringUtils.isBlank(request.sql)) {
             return false;
