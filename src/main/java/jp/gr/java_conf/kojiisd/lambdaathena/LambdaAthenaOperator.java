@@ -38,7 +38,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
         boolean valid = isRequiredValid(input);
 
         Formatter formatter = new Formatter();
-        String athenaUrl = formatter.format("jdbc:awsathena://athena.%s.amazonaws.com:443", input.region).toString();
+        String athenaUrl = formatter.format("jdbc:awsathena://AwsRegion=%s", input.region).toString();
         logger.log("Access to :" + athenaUrl + "\n");
 
         if (!valid) {
@@ -46,7 +46,7 @@ public class LambdaAthenaOperator implements RequestHandler<Request, Object> {
         }
 
         try {
-            Class.forName("com.amazonaws.athena.jdbc.AthenaDriver");
+            Class.forName("com.simba.athena.jdbc.Driver");
             Properties info = new Properties();
             if (StringUtils.isBlank(input.s3Path)) {
                 info.put("s3_staging_dir", "s3://");

@@ -29,6 +29,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-athena</artifactId>
+            <version>2.0.7</version>
+        </dependency>
 
 
     </dependencies>
@@ -60,11 +65,11 @@
                         <id>install-external</id>
                         <phase>clean</phase>
                         <configuration>
-                            <file>${basedir}/lib/AthenaJDBC41-1.0.0.jar</file>
+                            <file>${basedir}/lib/AthenaJDBC42_2.0.7.jar</file>
                             <repositoryLayout>default</repositoryLayout>
                             <groupId>com.amazonaws</groupId>
                             <artifactId>aws-lambda-athena</artifactId>
-                            <version>1.0</version>
+                            <version>2.0.7</version>
                             <packaging>jar</packaging>
                             <generatePom>true</generatePom>
                         </configuration>
